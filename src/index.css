@@ -1,0 +1,16 @@
+@import 'tailwindcss';
+
+@theme {
+  /* Change these two to retint every accent button/border/focus-ring in the app. */
+  --color-accent: #333;
+  --color-accent-hover: #222;
+}
+
+:root {
+  color-scheme: dark;   
+}
+
+body {
+  margin: 0;
+  font-family: system-ui, 'Segoe UI', Roboto, sans-serif;
+}

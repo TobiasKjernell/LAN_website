@@ -1,0 +1,31 @@
+Project: LAN Party Landing Page
+Build a single-page website for a LAN party event. Frontend only for now — backend integration will come later.
+Design
+
+Dark theme throughout
+Page content sits with 20px padding from the viewport edge, allowing shadows/depth around the main container
+Background image is admin-configurable
+Centered countdown timer as the main visual focus
+
+Auth
+
+Hardcoded login for now: { user: "admin", password: "123" }
+No public registration — just an admin login
+
+Admin Capabilities (visible only when logged in)
+
+Slide-out settings sidebar containing all editable options
+Change the LAN party name
+Change the countdown target date
+Change the background image
+
+Tech Stack
+
+TypeScript
+Vite
+Tailwind CSS
+Zustand (state management)
+Zod (validation)
+TanStack Query
+React Hook Form (useForm)
+
