@@ -1,7 +1,8 @@
-import { useEffect } from 'react'
+import { useEffect, useState } from 'react'
 import { useForm } from 'react-hook-form'
 import { zodResolver } from '@hookform/resolvers/zod'
 import { settingsSchema, type SettingsFormValues } from '../lib/schemas'
+import { ApiError, updateLanSettings } from '../lib/api'
 import { useSettingsStore } from '../store/settingsStore'
 import { useAuthStore } from '../store/authStore'
 import { useToastStore } from '../store/toastStore'
@@ -27,7 +28,10 @@ export function SettingsSidebar({ open, onClose }: SettingsSidebarProps) {
   const updateSettings = useSettingsStore((state) => state.updateSettings)
   const settings = { eventName, targetDate, backgroundImage: backgroundImageValue }
   const logout = useAuthStore((state) => state.logout)
+  const token = useAuthStore((state) => state.token)
   const showToast = useToastStore((state) => state.showToast)
+
+  const [selectedFile, setSelectedFile] = useState<File | null>(null)
 
   const {
     register,
@@ -41,24 +45,56 @@ export function SettingsSidebar({ open, onClose }: SettingsSidebarProps) {
     defaultValues: settings,
   })
 
-  useEffect(() => { 
+  useEffect(() => {
     if (open) {
       reset(settings)
+      setSelectedFile(null)
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [open])
 
   const backgroundImage = watch('backgroundImage')
 
-  const onSubmit = (values: SettingsFormValues) => {
-    updateSettings(values)
-    showToast('Settings saved')
-    onClose()
+  const onSubmit = async (values: SettingsFormValues) => {
+    if (!token) {
+      showToast('You must be logged in to save settings')
+      return
+    }
+
+    try {
+      const updated = await updateLanSettings(
+        token,
+        {
+          name: values.eventName,
+          lan_date: new Date(values.targetDate).toISOString(),
+        },
+        selectedFile,
+      )
+      updateSettings({
+        eventName: updated.name,
+        targetDate: updated.lan_date
+          ? new Date(updated.lan_date).toISOString().slice(0, 16)
+          : values.targetDate,
+        backgroundImage: updated.image_url,
+      })
+      setSelectedFile(null)
+      showToast('Settings saved')
+      onClose()
+    } catch (err) {
+      if (err instanceof ApiError && err.status === 401) {
+        logout()
+        showToast('Your session has expired. Please log in again.')
+        onClose()
+        return
+      }
+      showToast(err instanceof Error ? err.message : 'Failed to save settings')
+    }
   }
 
   const handleFileChange = async (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0]
     if (!file) return
+    setSelectedFile(file)
     const dataUrl = await readFileAsDataUrl(file)
     setValue('backgroundImage', dataUrl, { shouldDirty: true, shouldValidate: true })
   }

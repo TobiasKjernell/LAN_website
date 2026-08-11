@@ -1,17 +1,32 @@
-import { useState } from 'react'
+import { useEffect, useState } from 'react'
 import { Countdown } from './components/Countdown'
 import { LoginModal } from './components/LoginModal'
 import { SettingsSidebar } from './components/SettingsSidebar'
 import { Toaster } from './components/Toaster'
+import { useLanSettingsQuery } from './hooks/useLanSettings'
 import { useAuthStore } from './store/authStore'
 import { useSettingsStore } from './store/settingsStore'
 
 function App() {
   const isAuthenticated = useAuthStore((state) => state.isAuthenticated)
-  const { eventName, targetDate, backgroundImage } = useSettingsStore()
+  const { eventName, targetDate, backgroundImage, updateSettings } = useSettingsStore()
 
   const [loginOpen, setLoginOpen] = useState(false)
   const [sidebarOpen, setSidebarOpen] = useState(false)
+
+  const { data: lanSettings } = useLanSettingsQuery()
+
+  useEffect(() => {
+    if (!lanSettings) return
+    updateSettings({
+      eventName: lanSettings.name,
+      targetDate: lanSettings.lan_date
+        ? new Date(lanSettings.lan_date).toISOString().slice(0, 16)
+        : targetDate,
+      backgroundImage: lanSettings.image_url,
+    })
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [lanSettings])
 
   return (
     <div className="min-h-screen bg-[#222] p-5">

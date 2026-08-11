@@ -19,12 +19,12 @@ export function LoginModal({ onClose }: LoginModalProps) {
     defaultValues: { username: '', password: '' },
   })
 
-  const onSubmit = (values: LoginFormValues) => {
-    const success = login(values.username, values.password)
+  const onSubmit = async (values: LoginFormValues) => {
+    const success = await login(values.username, values.password)
     if (success) {
       onClose()
     } else {
-      setError('root', { message: 'Invalid username or password' })
+      setError('root', { message: useAuthStore.getState().error ?? 'Invalid username or password' })
     }
   }
 
