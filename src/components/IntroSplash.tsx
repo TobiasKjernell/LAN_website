@@ -116,10 +116,10 @@ export function IntroSplash({ onComplete }: IntroSplashProps) {
       aria-hidden="true"
       onClick={beginExit}
     >
-      {/* top half */}
+      {/* top half (overlaps 4px past center so no seam shows through while compositing) */}
       <motion.div
         className="fixed inset-0 flex items-center justify-center overflow-hidden bg-black"
-        style={{ clipPath: 'inset(0% 0% 50% 0%)' }}
+        style={{ clipPath: 'inset(0% 0% calc(50% - 4px) 0%)' }}
         initial={false}
         animate={exiting ? { y: '-55vh' } : { y: 0 }}
         transition={panelTransition}
@@ -127,10 +127,10 @@ export function IntroSplash({ onComplete }: IntroSplashProps) {
         <SplashContent prefersReducedMotion={!!prefersReducedMotion} />
       </motion.div>
 
-      {/* bottom half */}
+      {/* bottom half (overlaps 4px past center so no seam shows through while compositing) */}
       <motion.div
         className="fixed inset-0 flex items-center justify-center overflow-hidden bg-black"
-        style={{ clipPath: 'inset(50% 0% 0% 0%)' }}
+        style={{ clipPath: 'inset(calc(50% - 4px) 0% 0% 0%)' }}
         initial={false}
         animate={exiting ? { y: '55vh' } : { y: 0 }}
         transition={panelTransition}
