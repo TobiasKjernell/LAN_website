@@ -4,6 +4,7 @@
   /* Change these two to retint every accent button/border/focus-ring in the app. */
   --color-accent: #333;
   --color-accent-hover: #222;
+  --font-countdown: 'Orbitron', system-ui, sans-serif;
 }
 
 :root {

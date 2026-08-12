@@ -24,10 +24,10 @@ function getTimeLeft(targetDate: string): TimeLeft {
 function Unit({ value, label }: { value: number; label: string }) {
   return (
     <div className="flex flex-col items-center gap-1">
-      <span className="tabular-nums text-5xl sm:text-6xl md:text-7xl font-bold text-white drop-shadow-lg">
+      <span className="font-countdown tabular-nums text-3xl font-bold text-white drop-shadow-lg sm:text-6xl md:text-7xl">
         {String(value).padStart(2, '0')}
       </span>
-      <span className="text-xs sm:text-sm uppercase tracking-widest text-white/60">{label}</span>
+      <span className="text-[10px] uppercase tracking-widest text-white/60 sm:text-sm">{label}</span>
     </div>
   )
 }
@@ -53,13 +53,19 @@ export function Countdown({ targetDate }: CountdownProps) {
   }
 
   return (
-    <div className="flex items-center justify-center gap-4 sm:gap-8">
+    <div className="flex flex-wrap items-center justify-center gap-x-2 gap-y-2 sm:gap-x-8">
       <Unit value={timeLeft.days} label="days" />
-      <span className="text-4xl sm:text-6xl font-bold text-white/30 -mt-4">:</span>
+      <span className="font-countdown -mt-2 text-2xl font-bold text-white/30 sm:-mt-4 sm:text-6xl">
+        :
+      </span>
       <Unit value={timeLeft.hours} label="hours" />
-      <span className="text-4xl sm:text-6xl font-bold text-white/30 -mt-4">:</span>
+      <span className="font-countdown -mt-2 text-2xl font-bold text-white/30 sm:-mt-4 sm:text-6xl">
+        :
+      </span>
       <Unit value={timeLeft.minutes} label="min" />
-      <span className="text-4xl sm:text-6xl font-bold text-white/30 -mt-4">:</span>
+      <span className="font-countdown -mt-2 text-2xl font-bold text-white/30 sm:-mt-4 sm:text-6xl">
+        :
+      </span>
       <Unit value={timeLeft.seconds} label="sec" />
     </div>
   )
