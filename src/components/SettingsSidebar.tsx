@@ -1,4 +1,5 @@
 import { useEffect, useState } from 'react'
+import { useQueryClient } from '@tanstack/react-query'
 import { useForm } from 'react-hook-form'
 import { zodResolver } from '@hookform/resolvers/zod'
 import { settingsSchema, type SettingsFormValues } from '../lib/schemas'
@@ -6,6 +7,8 @@ import { ApiError, updateLanSettings } from '../lib/api'
 import { useSettingsStore } from '../store/settingsStore'
 import { useAuthStore } from '../store/authStore'
 import { useToastStore } from '../store/toastStore'
+import { toLocalDateTimeInputValue } from '../lib/date'
+import { SavingOverlay } from './SavingOverlay'
 
 interface SettingsSidebarProps {
   open: boolean
@@ -32,6 +35,8 @@ export function SettingsSidebar({ open, onClose }: SettingsSidebarProps) {
   const showToast = useToastStore((state) => state.showToast)
 
   const [selectedFile, setSelectedFile] = useState<File | null>(null)
+  const [isSaving, setIsSaving] = useState(false)
+  const queryClient = useQueryClient()
 
   const {
     register,
@@ -61,6 +66,7 @@ export function SettingsSidebar({ open, onClose }: SettingsSidebarProps) {
       return
     }
 
+    setIsSaving(true)
     try {
       const updated = await updateLanSettings(
         token,
@@ -70,10 +76,11 @@ export function SettingsSidebar({ open, onClose }: SettingsSidebarProps) {
         },
         selectedFile,
       )
+      queryClient.setQueryData(['lan-settings'], updated)
       updateSettings({
         eventName: updated.name,
         targetDate: updated.lan_date
-          ? new Date(updated.lan_date).toISOString().slice(0, 16)
+          ? toLocalDateTimeInputValue(updated.lan_date)
           : values.targetDate,
         backgroundImage: updated.image_url,
       })
@@ -88,6 +95,8 @@ export function SettingsSidebar({ open, onClose }: SettingsSidebarProps) {
         return
       }
       showToast(err instanceof Error ? err.message : 'Failed to save settings')
+    } finally {
+      setIsSaving(false)
     }
   }
 
@@ -183,9 +192,10 @@ export function SettingsSidebar({ open, onClose }: SettingsSidebarProps) {
           <div className="mt-auto flex flex-col gap-2 pt-4">
             <button
               type="submit"
-              className="rounded-md bg-accent px-4 py-2 text-sm font-medium text-white hover:bg-accent-hover"
+              disabled={isSaving}
+              className="rounded-md bg-accent px-4 py-2 text-sm font-medium text-white hover:bg-accent-hover disabled:cursor-not-allowed disabled:opacity-60"
             >
-              Save changes
+              {isSaving ? 'Saving…' : 'Save changes'}
             </button>
             <button
               type="button"
@@ -200,6 +210,8 @@ export function SettingsSidebar({ open, onClose }: SettingsSidebarProps) {
           </div>
         </form>
       </aside>
+
+      <SavingOverlay show={isSaving} message="Saving Settings" />
     </>
   )
 }

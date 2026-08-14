@@ -1,11 +1,12 @@
 import { create } from 'zustand'
 import { persist } from 'zustand/middleware'
 import type { LanSettings } from '../types'
+import { toLocalDateTimeInputValue } from '../lib/date'
 
 function defaultTargetDate(): string {
   const date = new Date()
   date.setDate(date.getDate() + 30)
-  return date.toISOString().slice(0, 16)
+  return toLocalDateTimeInputValue(date)
 }
 
 interface SettingsState extends LanSettings {

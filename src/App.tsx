@@ -8,6 +8,7 @@ import { Toaster } from './components/Toaster'
 import { useLanSettingsQuery } from './hooks/useLanSettings'
 import { useAuthStore } from './store/authStore'
 import { useSettingsStore } from './store/settingsStore'
+import { toLocalDateTimeInputValue } from './lib/date'
 
 function App() {
   const isAuthenticated = useAuthStore((state) => state.isAuthenticated)
@@ -24,7 +25,7 @@ function App() {
     updateSettings({
       eventName: lanSettings.name,
       targetDate: lanSettings.lan_date
-        ? new Date(lanSettings.lan_date).toISOString().slice(0, 16)
+        ? toLocalDateTimeInputValue(lanSettings.lan_date)
         : targetDate,
       backgroundImage: lanSettings.image_url,
     })
